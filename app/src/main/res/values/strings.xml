@@ -14,5 +14,11 @@
   <!-- Strings added due to support of multiple languages. -->
   <string name="stock_already_saved">This stock is already saved!</string>
 
+  <!-- Content description of an elements. -->
+  <string name="line_chart_view_content_description">This is line chart view.</string>
+  <string name="floating_action_button_content_description">This is action button for selected stock view.</string>
+  <string name="stock_symbol_content_description">This is stock symbol.</string>
+  <string name="bid_price_content_description">This is bid price.</string>
+  <string name="change_content_description">This is change.</string>
 
 </resources>
