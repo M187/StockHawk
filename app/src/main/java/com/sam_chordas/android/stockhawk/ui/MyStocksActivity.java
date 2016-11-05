@@ -19,6 +19,8 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.sam_chordas.android.stockhawk.R;
@@ -163,7 +165,17 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   }
 
   public void networkToast(){
-    Toast.makeText(mContext, getString(R.string.network_toast), Toast.LENGTH_SHORT).show();
+    Toast.makeText(mContext, getString(R.string.network_toast), Toast.LENGTH_LONG).show();
+
+    FrameLayout frameLayout = (FrameLayout) findViewById(R.id.main_view);
+
+    TextView textView1 = new TextView(this);
+    textView1.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT));
+    textView1.setText("No network connection!!!");
+    textView1.setBackgroundColor(0xff66ff66); // hex color 0xAARRGGBB
+    textView1.setPadding(20, 20, 20, 20);// in pixels (left, top, right, bottom)
+    frameLayout.addView(textView1);
   }
 
   public void restoreActionBar() {
