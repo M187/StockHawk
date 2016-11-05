@@ -3,7 +3,10 @@ package com.sam_chordas.android.stockhawk.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
+
 import com.google.android.gms.gcm.TaskParams;
 
 /**
@@ -11,8 +14,11 @@ import com.google.android.gms.gcm.TaskParams;
  */
 public class StockIntentService extends IntentService {
 
+  Handler mHandler;
+
   public StockIntentService(){
     super(StockIntentService.class.getName());
+    this.mHandler = new Handler();
   }
 
   public StockIntentService(String name) {
@@ -28,6 +34,25 @@ public class StockIntentService extends IntentService {
     }
     // We can call OnRunTask from the intent service to force it to run immediately instead of
     // scheduling a task.
-    stockTaskService.onRunTask(new TaskParams(intent.getStringExtra("tag"), args));
+    try {
+      stockTaskService.onRunTask(new TaskParams(intent.getStringExtra("tag"), args));
+    } catch (Exception e){
+      this.mHandler.post(new DisplayToast(
+              "Error while getting data for " + args.getString("symbol"), this));
+    }
+  }
+
+  private class DisplayToast implements Runnable{
+    String mText;
+    IntentService intent;
+
+    public DisplayToast(String text, IntentService intent){
+      mText = text;
+      this.intent = intent;
+    }
+
+    public void run(){
+      Toast.makeText(this.intent, mText, Toast.LENGTH_SHORT).show();
+    }
   }
 }
