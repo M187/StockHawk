@@ -77,8 +77,14 @@ public class Utils {
       String change = jsonObject.getString("Change");
       builder.withValue(QuoteColumns.SYMBOL, jsonObject.getString("symbol"));
       builder.withValue(QuoteColumns.BIDPRICE, truncateBidPrice(jsonObject.getString("Bid")));
-      builder.withValue(QuoteColumns.PERCENT_CHANGE, truncateChange(
-          jsonObject.getString("ChangeinPercent"), true));
+      builder.withValue(QuoteColumns.PERCENT_CHANGE, truncateChange(jsonObject.getString("ChangeinPercent"), true));
+
+      //Saving prices over time.
+      builder.withValue(QuoteColumns.DAYSHIGH, jsonObject.getString("DaysHigh"));
+      builder.withValue(QuoteColumns.DAYSLOW, jsonObject.getString("DaysLow"));
+      builder.withValue(QuoteColumns.YEARHIGH, jsonObject.getString("YearHigh"));
+      builder.withValue(QuoteColumns.YEARLOW, jsonObject.getString("YearLow"));
+
       builder.withValue(QuoteColumns.CHANGE, truncateChange(change, false));
       builder.withValue(QuoteColumns.ISCURRENT, 1);
       if (change.charAt(0) == '-'){

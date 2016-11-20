@@ -85,9 +85,25 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     mCursorAdapter = new QuoteCursorAdapter(this, null);
     recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(this,
             new RecyclerViewItemClickListener.OnItemClickListener() {
-              @Override public void onItemClick(View v, int position) {
+              @Override
+              public void onItemClick(View v, int position) {
                 //TODO:
-                // do something on item click
+                //Toast.makeText(v.getContext(), "Cliiicked!", Toast.LENGTH_SHORT).show();
+                //setContentView(R.layout.stock_detail_layout);
+
+                if ( mCursor.moveToPosition(position) ){
+                  Intent intent = new Intent(getBaseContext(), StockDetailActivity.class);
+
+                  intent.putExtra("Symbol", mCursor.getString(1));
+                  intent.putExtra("BidPrice", mCursor.getString(2));
+                  intent.putExtra("PercentChange", mCursor.getString(3));
+                  intent.putExtra("Change", mCursor.getString(4));
+                  startActivity(intent);
+                } else {
+                  Toast.makeText(v.getContext(), "Wrong cursor position!", Toast.LENGTH_SHORT).show();
+                }
+                //intent.putExtra(EXTRA_MESSAGE, message);
+
               }
             }));
     recyclerView.setAdapter(mCursorAdapter);
@@ -228,11 +244,22 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   public void onLoadFinished(Loader<Cursor> loader, Cursor data){
     mCursorAdapter.swapCursor(data);
     mCursor = data;
+
+    if (data.moveToFirst()) {
+      DataShare.dataRow1 = data.getString(1) + " : " + data.getString(2);
+      if (data.moveToNext()) {
+        DataShare.dataRow2 = data.getString(1) + " : " + data.getString(2);
+      }
+    }
   }
 
   @Override
   public void onLoaderReset(Loader<Cursor> loader){
     mCursorAdapter.swapCursor(null);
+  }
+
+  public void backToMain(View v){
+    setContentView(R.layout.activity_my_stocks);
   }
 
 }

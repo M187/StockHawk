@@ -25,4 +25,15 @@ public class QuoteColumns {
   public static final String ISUP = "is_up";
   @DataType(DataType.Type.INTEGER) @NotNull
   public static final String ISCURRENT = "is_current";
+
+  //Saving prices over time.
+  @DataType(DataType.Type.TEXT) @NotNull
+  public static final String DAYSLOW = "days_low";
+  @DataType(DataType.Type.TEXT) @NotNull
+  public static final String DAYSHIGH = "days_high";
+  @DataType(DataType.Type.TEXT) @NotNull
+  public static final String YEARLOW = "year_low";
+  @DataType(DataType.Type.TEXT) @NotNull
+  public static final String YEARHIGH = "year_high";
+
 }
