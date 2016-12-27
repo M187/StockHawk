@@ -21,4 +21,9 @@
   <string name="bid_price_content_description">This is bid price.</string>
   <string name="change_content_description">This is change.</string>
 
+  <string name="stock_symbol_string">Stock symbol: </string>
+  <string name="bid_price_string">Bid price: </string>
+  <string name="percent_change_string">Percent change: </string>
+  <string name="change_string">Change: </string>
+
 </resources>

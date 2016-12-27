@@ -70,6 +70,11 @@ public class Utils {
     return change;
   }
 
+  /**
+   * Saving values parsed from Json into our Databse.
+   * @param jsonObject
+   * @return
+   */
   public static ContentProviderOperation buildBatchOperation(JSONObject jsonObject){
     ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
         QuoteProvider.Quotes.CONTENT_URI);

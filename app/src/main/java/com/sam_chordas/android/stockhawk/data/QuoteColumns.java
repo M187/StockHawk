@@ -36,4 +36,7 @@ public class QuoteColumns {
   @DataType(DataType.Type.TEXT) @NotNull
   public static final String YEARHIGH = "year_high";
 
+  //@DataType(DataType.Type.TEXT) @NotNull
+  //public static final String DAY_DATE = "day_timestamp";
+
 }
