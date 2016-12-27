@@ -100,7 +100,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                   intent.putExtra("Change", mCursor.getString(4));
                   startActivity(intent);
                 } else {
-                  Toast.makeText(v.getContext(), "Wrong cursor position!", Toast.LENGTH_SHORT).show();
+                  Toast.makeText(v.getContext(), R.string.wrong_cursor_position_string, Toast.LENGTH_SHORT).show();
                 }
                 //intent.putExtra(EXTRA_MESSAGE, message);
 

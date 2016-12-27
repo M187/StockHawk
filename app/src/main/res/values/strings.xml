@@ -26,4 +26,6 @@
   <string name="percent_change_string">Percent change: </string>
   <string name="change_string">Change: </string>
 
+  <string name="wrong_cursor_position_string">Wrong cursor position!</string>
+
 </resources>
