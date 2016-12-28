@@ -4,11 +4,17 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LimitLine;
@@ -20,8 +26,15 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.sam_chordas.android.stockhawk.R;
+import com.sam_chordas.android.stockhawk.volley.AppRequestQueue;
+import com.sam_chordas.android.stockhawk.volley.FetchPricesOverTime;
 
+import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by michal.hornak on 11/5/2016.
@@ -32,6 +45,9 @@ public class StockDetailActivity extends FragmentActivity implements SeekBar.OnS
     private SeekBar mSeekBarX, mSeekBarY;
     private TextView tvX, tvY;
 
+    private ArrayList<Entry> dataOverTime = new ArrayList<>();
+    private FetchPricesOverTime fetcher = new FetchPricesOverTime(this);
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -39,13 +55,49 @@ public class StockDetailActivity extends FragmentActivity implements SeekBar.OnS
 
         Bundle bundle = getIntent().getExtras();
 
-        ((TextView) findViewById(R.id.detail_stock_symbol)).setText(R.string.stock_symbol_string + bundle.getString("Symbol"));
-        ((TextView) findViewById(R.id.detail_bid_price)).setText(R.string.bid_price_string + bundle.getString("BidPrice"));
-        ((TextView) findViewById(R.id.detail_percent_change)).setText(R.string.percent_change_string + bundle.getString("PercentChange"));
-        ((TextView) findViewById(R.id.detail_change)).setText(R.string.change_string + bundle.getString("Change"));
+        ((TextView) findViewById(R.id.detail_stock_symbol)).setText(getResources().getString(R.string.stock_symbol_string) + " " + bundle.getString("Symbol"));
+        ((TextView) findViewById(R.id.detail_bid_price)).setText(getResources().getString(R.string.bid_price_string) +  " " + bundle.getString("BidPrice"));
+        ((TextView) findViewById(R.id.detail_percent_change)).setText(getResources().getString(R.string.percent_change_string) +  " " + bundle.getString("PercentChange"));
+        ((TextView) findViewById(R.id.detail_change)).setText(getResources().getString(R.string.change_string) +  " " + bundle.getString("Change"));
 
+        fetchStockOverTimeData(bundle);
         createLineGraph();
     }
+
+
+    private void fetchStockOverTimeData(Bundle bundle){
+
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+
+        String finishDate = dateFormat.format(cal.getTime());
+
+        cal.add(Calendar.DATE, -10);
+        String startDate = dateFormat.format(cal.getTime());
+
+        String url = ("http://query.yahooapis.com/v1/public/yql?q=select%20Close%20from%20yahoo.finance.historicaldata%20" +
+                "where%20symbol%20in%20%28%27" + bundle.getString("Symbol") + "%27%29%20" +
+                "and%20startDate%20=%20%27" + startDate + "%27%20" +
+                "and%20endDate%20=%20%27" + finishDate + "%27&format=json&diagnostics=true&env=store://datatables.org/alltableswithkeys");
+
+        AppRequestQueue.getInstance(this).addToRequestQueue(
+                new JsonObjectRequest(
+                        Request.Method.GET,
+                        url,
+                        null,
+                        this.fetcher,
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(getBaseContext(), "Error during fetching data!", Toast.LENGTH_LONG).show();
+                                Log.d("ToastError:", error.toString());
+                            }
+                        }
+                ));
+    }
+
 
     private void createLineGraph(){
 
@@ -53,11 +105,11 @@ public class StockDetailActivity extends FragmentActivity implements SeekBar.OnS
         tvY = (TextView) findViewById(R.id.tvYMax);
         mSeekBarX = (SeekBar) findViewById(R.id.seekBar1);
         mSeekBarY = (SeekBar) findViewById(R.id.seekBar2);
-        mSeekBarX.setProgress(45);
-        mSeekBarY.setProgress(100);
+//        mSeekBarX.setProgress(45);
+//        mSeekBarY.setProgress(100);
 
-        mSeekBarY.setOnSeekBarChangeListener(this);
-        mSeekBarX.setOnSeekBarChangeListener(this);
+//        mSeekBarY.setOnSeekBarChangeListener(this);
+//        mSeekBarX.setOnSeekBarChangeListener(this);
 
         mChart = (BarChart) findViewById(R.id.chart1);
         mChart.setDrawGridBackground(false);
@@ -80,10 +132,10 @@ public class StockDetailActivity extends FragmentActivity implements SeekBar.OnS
 
         YAxis leftAxis = mChart.getAxisLeft();
         leftAxis.removeAllLimitLines(); // reset all limit lines to avoid overlapping lines
-        leftAxis.setAxisMaximum(10f);
-        leftAxis.setAxisMinimum(-5f);
+        leftAxis.setAxisMaximum(40f);
+        leftAxis.setAxisMinimum(20f);
         leftAxis.enableGridDashedLine(10f, 10f, 0f);
-        leftAxis.setDrawZeroLine(false);
+        //leftAxis.setDrawZeroLine(false);
 
         // limit lines are drawn behind data (and not on top)
         leftAxis.setDrawLimitLinesBehindData(true);
@@ -91,14 +143,14 @@ public class StockDetailActivity extends FragmentActivity implements SeekBar.OnS
         mChart.getAxisRight().setEnabled(false);
 
         ArrayList<Entry> data = new ArrayList<>();
-        data.add(new BarEntry(1,1));
-        data.add(new BarEntry(2,5));
-        data.add(new BarEntry(3,3));
-        data.add(new BarEntry(4,6));
-        data.add(new BarEntry(5,-3));
+        data.add(new BarEntry(1,31));
+        data.add(new BarEntry(2,35));
+        data.add(new BarEntry(3,33));
+        data.add(new BarEntry(4,36));
+        data.add(new BarEntry(5,33));
         setData(data);
 
-        mChart.animateX(2500);
+        //mChart.animateX(2500);
         //mChart.invalidate();
 
         // get the legend (only possible after setting data)
@@ -150,7 +202,7 @@ public class StockDetailActivity extends FragmentActivity implements SeekBar.OnS
 
     }
 
-    private void setData(ArrayList dataList){
+    public void setData(ArrayList dataList){
         BarDataSet set1;
 
         if (mChart.getData() != null &&
@@ -180,6 +232,7 @@ public class StockDetailActivity extends FragmentActivity implements SeekBar.OnS
 
             // set data
             mChart.setData(data);
+            mChart.invalidate();
         }
     }
 }
