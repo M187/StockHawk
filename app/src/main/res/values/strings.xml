@@ -27,5 +27,6 @@
   <string name="change_string">Change: </string>
 
   <string name="wrong_cursor_position_string">Wrong cursor position!</string>
+  <string name="graph_description_string">Stock value over time</string>
 
 </resources>

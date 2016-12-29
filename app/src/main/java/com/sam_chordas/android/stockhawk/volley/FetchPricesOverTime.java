@@ -2,13 +2,12 @@ package com.sam_chordas.android.stockhawk.volley;
 
 import com.android.volley.Response;
 import com.github.mikephil.charting.data.BarEntry;
+import com.sam_chordas.android.stockhawk.data.GraphData;
 import com.sam_chordas.android.stockhawk.ui.StockDetailActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 
 /**
@@ -19,7 +18,8 @@ import java.util.ArrayList;
  */
 public class FetchPricesOverTime implements Response.Listener<JSONObject> {
 
-    public ArrayList<BarEntry> responseCloseNodeValues;
+    //public ArrayList<BarEntry> responseCloseNodeValues;
+    public GraphData graphData;
     private StockDetailActivity parent;
 
     public FetchPricesOverTime(StockDetailActivity stockDetailActivity){
@@ -29,7 +29,8 @@ public class FetchPricesOverTime implements Response.Listener<JSONObject> {
     @Override
     public void onResponse(JSONObject response) {
         try {
-            responseCloseNodeValues = new ArrayList<>();
+            graphData = new GraphData();
+            //responseCloseNodeValues = new ArrayList<>();
             parseResponse(
                     response
                             .getJSONObject("query")
@@ -38,14 +39,22 @@ public class FetchPricesOverTime implements Response.Listener<JSONObject> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        this.parent.setData(responseCloseNodeValues);
+        this.parent.setData(graphData);
     }
 
     private void parseResponse(JSONArray jsonArray) {
         int i = 0;
+        float currentValue;
         while (i < jsonArray.length()) {
             try {
-                responseCloseNodeValues.add(new BarEntry((float)i, (float)Double.parseDouble(jsonArray.getJSONObject(i).get("Close").toString())));
+
+                currentValue = (float) Double.parseDouble(jsonArray.getJSONObject(i).get("Close").toString());
+
+                if (graphData.getLeftAxisMax() < currentValue || i == 0) {graphData.setLeftAxisMax(currentValue);}
+                if (graphData.getLeftAxisMin() > currentValue || i == 0) {graphData.setLeftAxisMin(currentValue);}
+
+                graphData.responseCloseNodeValues.add(new BarEntry((float) i, currentValue));
+
             } catch (Exception e) {
             }
             i++;
